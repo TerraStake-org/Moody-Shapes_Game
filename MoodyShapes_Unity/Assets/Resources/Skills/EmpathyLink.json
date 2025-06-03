@@ -1,0 +1,20 @@
+{
+    "name": "Empathy Link",
+    "description": "Creates a passive link that shares emotions between you and nearby friendly shapes.",
+    "icon": "LinkIcon",
+    "requiredEmotion": "Curious",
+    "minimumIntensity": 0.3,
+    "consumesEmotion": false,
+    "emotionConsumptionAmount": 0.0,
+    "cooldownTime": 20.0,
+    "castTime": 1.5,
+    "isPassive": true,
+    "effectType": "Area",
+    "effectRadius": 3.0,
+    "effectDuration": 30.0,
+    "effectPower": 0.4,
+    "effectColor": "#c792ea",
+    "targetLayers": "Shapes",
+    "requiresLineOfSight": true,
+    "emotionTransferable": true
+}

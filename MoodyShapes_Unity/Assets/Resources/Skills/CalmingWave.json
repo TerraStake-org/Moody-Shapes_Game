@@ -1,0 +1,20 @@
+{
+    "name": "Calming Wave",
+    "description": "Reduces negative emotions in the target, replacing them with calm.",
+    "icon": "CalmIcon",
+    "requiredEmotion": "Calm",
+    "minimumIntensity": 0.4,
+    "consumesEmotion": true,
+    "emotionConsumptionAmount": 0.3,
+    "cooldownTime": 6.0,
+    "castTime": 0.5,
+    "isPassive": false,
+    "effectType": "Target",
+    "effectRadius": 0.0,
+    "effectDuration": 5.0,
+    "effectPower": 0.7,
+    "effectColor": "#5bb1dc",
+    "targetLayers": "Shapes",
+    "requiresLineOfSight": true,
+    "emotionTransferable": true
+}

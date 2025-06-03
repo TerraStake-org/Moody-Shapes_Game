@@ -1,0 +1,20 @@
+{
+    "name": "Joy Burst",
+    "description": "Shares your joy with all nearby shapes, spreading happiness in a radius.",
+    "icon": "JoyIcon",
+    "requiredEmotion": "Happy",
+    "minimumIntensity": 0.6,
+    "consumesEmotion": true,
+    "emotionConsumptionAmount": 0.5,
+    "cooldownTime": 8.0,
+    "castTime": 1.0,
+    "isPassive": false,
+    "effectType": "Area",
+    "effectRadius": 5.0,
+    "effectDuration": 4.0,
+    "effectPower": 1.0,
+    "effectColor": "#ffdd00",
+    "targetLayers": "Shapes",
+    "requiresLineOfSight": false,
+    "emotionTransferable": true
+}

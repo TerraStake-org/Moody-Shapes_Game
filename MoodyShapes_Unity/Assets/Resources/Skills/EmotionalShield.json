@@ -1,0 +1,20 @@
+{
+    "name": "Emotional Shield",
+    "description": "Creates a protective barrier that blocks negative emotions for a time.",
+    "icon": "ShieldIcon",
+    "requiredEmotion": "Calm",
+    "minimumIntensity": 0.5,
+    "consumesEmotion": true,
+    "emotionConsumptionAmount": 0.4,
+    "cooldownTime": 15.0,
+    "castTime": 0.8,
+    "isPassive": false,
+    "effectType": "Self",
+    "effectRadius": 0.0,
+    "effectDuration": 10.0,
+    "effectPower": 0.8,
+    "effectColor": "#92e8c0",
+    "targetLayers": "Shapes",
+    "requiresLineOfSight": false,
+    "emotionTransferable": false
+}
