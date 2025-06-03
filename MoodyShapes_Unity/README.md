@@ -38,12 +38,38 @@ An emotional puzzle game where geometric shapes express different moods and emot
 1. Open Unity Hub
 2. Add this project folder
 3. Open with Unity 2022.3 LTS or later
-4. Install required packages from Package Manager
+4. Required packages will be installed automatically via the manifest
 
-## Development Notes
-- This game focuses on emotional AI and adaptive gameplay
-- Shape emotions drive both visual presentation and puzzle mechanics
-- Music and sound effects adapt to player behavior and preferences
+## Requirements
+### Core Requirements
+- Unity 2022.3 LTS or later
+- Universal Render Pipeline (URP) 14.0.8 or later
+- Cinemachine 2.9.7 or later
+- TextMeshPro 3.0.6 or later
+- Visual Effect Graph 14.0.8 or later
+
+### System Requirements
+- OS: Windows 10/11, macOS 12+, or Linux
+- GPU: Graphics card with DX11 (Shader Model 4.5) or higher capabilities
+- CPU: SSE2 instruction set support
+- RAM: 8GB minimum, 16GB recommended
+- Storage: 2GB available space
+
+### Post-Processing Effects Setup
+1. Ensure URP is properly set up in your project
+2. Make sure your camera has a Volume component attached
+3. Create a Volume Profile with the following effects:
+   - Bloom
+   - Color Adjustments
+   - Vignette
+   - Film Grain
+   - Depth of Field
+4. The EmotionScreenEffectsInitializer can automatically set up these components
+
+### Screen Shake Setup
+1. Make sure Cinemachine is installed
+2. The main camera should use a CinemachineBrain component
+3. The EmotionScreenEffectsInitializer will create the necessary CinemachineImpulseSource
 
 ## Credits
 - Game Design: [Your Name]

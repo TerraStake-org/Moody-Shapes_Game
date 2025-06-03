@@ -1,0 +1,114 @@
+# Moody Shapes - Requirements Document
+
+## Unity Version
+- Unity 2022.3 LTS or later
+- Unity Editor with Windows, macOS, or Linux build support
+
+## Required Packages
+### Core Packages
+- Universal Render Pipeline (URP) - version 14.0.8 or later
+  - Required for post-processing effects like bloom, color grading, vignette
+  - Used for the emotion-based visual effects system
+
+- Cinemachine - version 2.9.7 or later
+  - Required for camera shake effects
+  - Used for the emotion-triggered screen shake system
+
+- TextMeshPro - version 3.0.6 or later
+  - Required for UI text rendering
+  - Used for emotion tooltips and skill UI
+
+- Visual Effect Graph - version 14.0.8 or later
+  - Required for advanced particle effects
+  - Used for emotional particle visualizations
+
+### Standard Unity Modules (included by default)
+- Animation
+- Audio
+- Particle System
+- Physics
+- UI
+- UI Elements
+
+## Third-Party Assets (Optional)
+- Shapes package - for procedural geometry
+- DOTween - for smooth animations
+- Color Studio - for color palette management
+
+## Hardware Requirements
+### Minimum Specifications
+- OS: Windows 10, macOS 12+, or Linux
+- CPU: 1.8 GHz dual-core processor
+- GPU: Graphics card with DX11 (SM 4.5)
+- RAM: 8GB
+- Storage: 2GB available space
+
+### Recommended Specifications
+- OS: Windows 11, macOS 13+
+- CPU: 2.5 GHz quad-core processor
+- GPU: Graphics card with DX12 or Metal support
+- RAM: 16GB
+- Storage: 4GB available space (SSD preferred)
+
+## Development Environment Setup
+1. Clone the repository
+2. Open the project in Unity 2022.3 LTS or later
+3. The package manifest will automatically install required packages
+4. Import any optional third-party assets (not included in the repository)
+
+## Feature-Specific Requirements
+
+### Emotion System Requirements
+- No additional packages required
+- Uses core Unity functionality
+
+### Skill System Requirements
+- TextMeshPro for UI
+- Particle System module for visual effects
+
+### Screen-Space Effects Requirements
+- Universal Render Pipeline (URP)
+  - Make sure the project uses URP rendering
+  - Required URP features:
+    - Post-processing enabled in URP Asset
+    - Volume system
+    - Bloom effect
+    - Color Adjustments
+    - Vignette effect
+    - Film Grain effect
+    - Depth of Field effect
+
+- Cinemachine
+  - Required Cinemachine features:
+    - CinemachineImpulseSource
+    - CinemachineImpulseListener
+
+### Animation System Requirements
+- Animation module
+- Optional: DOTween for procedural animations
+
+### Audio System Requirements
+- Audio module (included by default)
+- AudioMixer for mixing multiple emotion-based music layers
+- Audio clips organized by emotion type:
+  - Base/neutral background music
+  - Emotion-specific music layers
+  - Emotional stingers for transitions
+- Recommended folder structure:
+  - Audio/Music/Base
+  - Audio/Music/Emotions
+  - Audio/SFX/Stingers
+  - Audio/SFX/Shapes
+
+## Testing Requirements
+- Unity Test Framework
+- Input simulation tools for player interactions
+
+## Building Requirements
+- Windows, macOS, or Linux build support modules
+- Android or iOS modules for mobile builds (if targeting mobile)
+
+## Notes
+- URP must be properly set up for post-processing effects to work
+- Cinemachine impulse sources need to be properly configured for screen shake
+- The EmotionScreenEffectsInitializer script can automatically set up most required components

@@ -14,9 +14,22 @@ public class EmotionSystem : MonoBehaviour
     private EmotionalState _currentEmotionalState;
     [SerializeField, ReadOnly]
     private List<ActiveEmotionModifier> _activeModifiers = new List<ActiveEmotionModifier>();
-    
-    // Public accessors
+      // Public accessors
     public EmotionalState CurrentState => _currentEmotionalState;
+    public EmotionProfileSO EmotionProfile => _emotionProfile;
+    
+    /// <summary>
+    /// Sets the emotion profile for this system.
+    /// </summary>
+    /// <param name="profile">The emotion profile to use</param>
+    public void SetEmotionProfile(EmotionProfileSO profile)
+    {
+        _emotionProfile = profile;
+        if (_currentEmotionalState != null)
+        {
+            InitializeState();
+        }
+    }
     
     // Events
     public event System.Action<EmotionChangeEvent> OnEmotionChanged;
@@ -106,9 +119,7 @@ public class EmotionSystem : MonoBehaviour
                 });
             }
         }
-    }
-
-    private void ProcessDecay()
+    }    private void ProcessDecay()
     {
         bool changed = _currentEmotionalState.Decay(
             _emotionProfile.emotionalDecayRate * GetDecayMultiplier(),
@@ -117,14 +128,14 @@ public class EmotionSystem : MonoBehaviour
 
         if (changed)
         {
-            var change = new EmotionChangeEvent {
-                entity = gameObject,
-                oldEmotion = _currentEmotionalState.CurrentEmotion,
-                oldIntensity = _currentEmotionalState.Intensity,
-                newEmotion = _currentEmotionalState.CurrentEmotion,
-                newIntensity = _currentEmotionalState.Intensity,
-                source = EmotionChangeSource.Decay
-            };
+            var change = new EmotionChangeEvent(
+                gameObject,
+                _currentEmotionalState.CurrentEmotion,
+                _currentEmotionalState.Intensity,
+                _currentEmotionalState.CurrentEmotion,
+                _currentEmotionalState.Intensity,
+                EmotionChangeSource.Decay
+            );
             NotifyChange(change);
         }
 
@@ -138,8 +149,7 @@ public class EmotionSystem : MonoBehaviour
     }
     #endregion
 
-    #region Helper Methods
-    private EmotionChangeEvent CalculateEmotionChange(EmotionalStimulus stimulus, ReactionRule rule)
+    #region Helper Methods    private EmotionChangeEvent CalculateEmotionChange(EmotionalStimulus stimulus, ReactionRule rule)
     {
         EmotionType newEmotion = rule.overrideCurrentEmotion ?
             rule.resultingEmotion : _currentEmotionalState.CurrentEmotion;
@@ -157,15 +167,16 @@ public class EmotionSystem : MonoBehaviour
             rule.maxIntensityForThisReaction
         );
 
-        return new EmotionChangeEvent {
-            entity = gameObject,
-            oldEmotion = _currentEmotionalState.CurrentEmotion,
-            oldIntensity = _currentEmotionalState.Intensity,
-            newEmotion = newEmotion,
-            newIntensity = newIntensity,
-            source = EmotionChangeSource.Stimulus,
-            stimulus = stimulus
-        };
+        var change = new EmotionChangeEvent(
+            gameObject,
+            _currentEmotionalState.CurrentEmotion,
+            _currentEmotionalState.Intensity,
+            newEmotion,
+            newIntensity,
+            EmotionChangeSource.Stimulus
+        );
+        change.stimulus = stimulus;
+        return change;
     }
 
     private float GetDecayMultiplier()
@@ -280,23 +291,21 @@ public class EmotionSystem : MonoBehaviour
             Debug.LogError($"Missing EmotionProfile on {gameObject.name}", this);
             enabled = false;
         }
-    }
-
-    private void InitializeState()
+    }    private void InitializeState()
     {
         _currentEmotionalState = new EmotionalState(
             _emotionProfile.dominantTrait,
             _emotionProfile.baselineIntensity
         );
 
-        NotifyChange(new EmotionChangeEvent {
-            entity = gameObject,
-            oldEmotion = EmotionType.Neutral,
-            oldIntensity = 0f,
-            newEmotion = _currentEmotionalState.CurrentEmotion,
-            newIntensity = _currentEmotionalState.Intensity,
-            source = EmotionChangeSource.Initialization
-        });
+        NotifyChange(new EmotionChangeEvent(
+            gameObject,
+            EmotionType.Neutral,
+            0f,
+            _currentEmotionalState.CurrentEmotion,
+            _currentEmotionalState.Intensity,
+            EmotionChangeSource.Initialization
+        ));
     }
     #endregion
 }
@@ -311,7 +320,21 @@ public struct EmotionChangeEvent
     public float newIntensity;
     public EmotionChangeSource source;
     public EmotionalStimulus stimulus;
+    public float changeTime; // When this change occurred (Time.time)
     public bool hasChanged => oldEmotion != newEmotion || !Mathf.Approximately(oldIntensity, newIntensity);
+    
+    public EmotionChangeEvent(GameObject entity, EmotionType oldEmotion, float oldIntensity, 
+                             EmotionType newEmotion, float newIntensity, EmotionChangeSource source)
+    {
+        this.entity = entity;
+        this.oldEmotion = oldEmotion;
+        this.oldIntensity = oldIntensity;
+        this.newEmotion = newEmotion;
+        this.newIntensity = newIntensity;
+        this.source = source;
+        this.stimulus = null;
+        this.changeTime = Time.time;
+    }
 }
 
 public enum EmotionChangeSource { Initialization, Stimulus, Decay, Script }

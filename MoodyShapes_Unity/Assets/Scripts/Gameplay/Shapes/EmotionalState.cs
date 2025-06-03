@@ -75,18 +75,7 @@ public class EmotionalState : MonoBehaviour
     public void ModifyIntensity(float amount)
     {
         SetEmotion(CurrentEmotion, Intensity + amount);
-    }
-
-    public void UpdateDecay(float deltaTime)
-    {
-        decayTimer += deltaTime;
-        if (decayTimer >= decayCheckInterval)
-        {
-            decayTimer = 0;
-            ApplyDecay(decayCheckInterval);
-        }
-    }
-
+    }    // This method has been replaced by the version below that respects the decaySuspended flag
     private void ApplyDecay(float deltaTime)
     {
         if (CurrentEmotion == Personality.DominantTrait &&
