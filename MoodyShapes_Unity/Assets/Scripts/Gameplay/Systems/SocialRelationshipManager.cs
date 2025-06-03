@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 [System.Serializable]
 public class SocialRelationship
@@ -128,5 +129,10 @@ public class SocialRelationshipManager : MonoBehaviour
         }
        
         relationship.relationshipScore = Mathf.Clamp(relationship.relationshipScore, -1f, 1f);
+    }
+
+    public List<SocialRelationship> GetAllRelationships()
+    {
+        return _relationships.Values.ToList();
     }
 }
