@@ -44,15 +44,30 @@ public class EmotionalState : MonoBehaviour
         bool intensityChanged = !Mathf.Approximately(Intensity, newIntensity);
 
         CurrentEmotion = newEmotion;
-        Intensity = newIntensity;
-
-        if (emotionChanged || intensityChanged)
+        Intensity = newIntensity;        if (emotionChanged || intensityChanged)
         {
             OnEmotionChanged?.Invoke(CurrentEmotion, Intensity);
            
             if (Intensity >= 0.99f)
             {
                 OnEmotionPeaked?.Invoke(CurrentEmotion);
+                
+                // Trigger screen effects for peaked emotions
+                EmotionScreenEffects.TriggerCombinedEffect(
+                    CurrentEmotion, 
+                    1.0f, 
+                    transform.position, 
+                    1.8f
+                );
+            }
+            else if (Intensity >= 0.85f && intensityChanged && Intensity > 0.2f)
+            {
+                // Trigger less intense effects for high but not peak emotions
+                EmotionScreenEffects.TriggerEmotionPulse(
+                    CurrentEmotion,
+                    Intensity * 0.7f,
+                    1.0f
+                );
             }
         }
     }

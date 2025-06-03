@@ -190,12 +190,35 @@ public class EmotionSystem : MonoBehaviour
                 RecalculateState();
             }
         }
-    }
-
-    private void NotifyChange(EmotionChangeEvent change)
+    }    private void NotifyChange(EmotionChangeEvent change)
     {
         OnEmotionChanged?.Invoke(change);
         OnAnyEmotionChanged?.Invoke(change);
+
+        // Trigger screen effects for significant emotional changes
+        if (change.newIntensity > 0.8f && change.newIntensity > change.oldIntensity + 0.2f)
+        {
+            // Trigger more intense effects for peak emotions
+            if (change.newIntensity > 0.95f)
+            {
+                // Very intense emotion - trigger combined effect
+                EmotionScreenEffects.TriggerCombinedEffect(
+                    change.newEmotion, 
+                    change.newIntensity, 
+                    transform.position, 
+                    1.5f
+                );
+            }
+            else
+            {
+                // Moderately intense emotion - just post-processing
+                EmotionScreenEffects.TriggerEmotionPulse(
+                    change.newEmotion,
+                    change.newIntensity * 0.8f,
+                    1.0f
+                );
+            }
+        }
 
         // Threshold behavior check
         var thresholdBehavior = _emotionProfile.GetThresholdBehavior(
