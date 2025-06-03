@@ -34,9 +34,20 @@ public class GameObjectiveManager : MonoBehaviour
     public UnityEvent OnObjectivesFailed;
     public UnityEvent<float> OnTimeRemainingUpdated;
 
+    [Header("Replayability Settings")]
+    [Tooltip("Enable hidden endings based on player choices.")]
+    [SerializeField] private bool enableHiddenEndings = true;
+
+    [Tooltip("Enable evolving rulesets every few levels.")]
+    [SerializeField] private bool enableEvolvingRulesets = true;
+
     private List<EmotionSystem> _shapes;
     private float _elapsedTime;
     private bool _ended;
+    private Dictionary<EmotionType, int> _emotionUsage;
+    private List<string> _shapeLetters;
+    private int _currentLevel;
+    private bool _hiddenEndingTriggered;
 
     private void Awake()
     {
@@ -46,6 +57,14 @@ public class GameObjectiveManager : MonoBehaviour
         {
             relationshipManager = FindObjectOfType<SocialRelationshipManager>();
         }
+
+        _emotionUsage = new Dictionary<EmotionType, int>();
+        foreach (EmotionType emotion in System.Enum.GetValues(typeof(EmotionType)))
+        {
+            _emotionUsage[emotion] = 0;
+        }
+
+        _shapeLetters = new List<string>();
     }
 
     private void Update()
@@ -71,6 +90,10 @@ public class GameObjectiveManager : MonoBehaviour
             _ended = true;
             OnObjectivesFailed?.Invoke();
         }
+
+        CheckHiddenEnding();
+        ApplyEvolvingRuleset();
+        ApplyEnvironmentalChanges();
     }
 
     /// <summary>
@@ -120,6 +143,80 @@ public class GameObjectiveManager : MonoBehaviour
         return minScore >= hostilityThreshold;
     }
 
+    private void TrackEmotionUsage(EmotionType emotion)
+    {
+        if (_emotionUsage.ContainsKey(emotion))
+        {
+            _emotionUsage[emotion]++;
+        }
+    }
+
+    private EmotionType GetDominantEmotion()
+    {
+        EmotionType dominantEmotion = EmotionType.Neutral;
+        int maxUsage = 0;
+
+        foreach (var entry in _emotionUsage)
+        {
+            if (entry.Value > maxUsage)
+            {
+                maxUsage = entry.Value;
+                dominantEmotion = entry.Key;
+            }
+        }
+
+        return dominantEmotion;
+    }
+
+    private void ApplyEnvironmentalChanges()
+    {
+        EmotionType dominantEmotion = GetDominantEmotion();
+
+        switch (dominantEmotion)
+        {
+            case EmotionType.Anger:
+                // Apply darker level visuals
+                Debug.Log("Environment adapting to Anger: Darker visuals.");
+                break;
+            case EmotionType.Joy:
+                // Apply brighter level visuals
+                Debug.Log("Environment adapting to Joy: Brighter visuals.");
+                break;
+            // Add cases for other emotions as needed
+        }
+    }
+
+    private void GenerateShapeLetters()
+    {
+        _shapeLetters.Clear();
+        foreach (var shape in _shapes)
+        {
+            string letter = $"Dear Player,\n\nI am feeling {shape.CurrentState.CurrentEmotion}.\n";
+
+            if (shape.CurrentState.CurrentEmotion == EmotionType.Anger)
+            {
+                letter += "Why did you make me angry? Please help me calm down.\n";
+            }
+            else if (shape.CurrentState.CurrentEmotion == EmotionType.Joy)
+            {
+                letter += "Thank you for making me happy! I feel so light and free.\n";
+            }
+            else if (shape.CurrentState.CurrentEmotion == EmotionType.Sadness)
+            {
+                letter += "I am feeling down. Can you bring some joy into my life?\n";
+            }
+
+            letter += "Sincerely,\nYour Shape\n";
+            _shapeLetters.Add(letter);
+        }
+    }
+
+    public List<string> GetShapeLetters()
+    {
+        GenerateShapeLetters();
+        return _shapeLetters;
+    }
+
     /// <summary>
     /// Ratio of shapes with the target emotion (0 to 1)
     /// </summary>
@@ -162,4 +259,28 @@ public class GameObjectiveManager : MonoBehaviour
     /// Remaining time before time limit
     /// </summary>
     public float TimeRemaining => Mathf.Max(0f, timeLimitSeconds - _elapsedTime);
+
+    private void CheckHiddenEnding()
+    {
+        if (!enableHiddenEndings || _hiddenEndingTriggered) return;
+
+        if (SpreadRatio >= 0.9f && MinRelationshipScore >= 0.8f)
+        {
+            _hiddenEndingTriggered = true;
+            Debug.Log("Hidden Ending Unlocked: Perfect Harmony!");
+            OnObjectivesSucceeded?.Invoke();
+        }
+    }
+
+    private void ApplyEvolvingRuleset()
+    {
+        if (!enableEvolvingRulesets) return;
+
+        if (_currentLevel % 5 == 0)
+        {
+            Debug.Log("Evolving Ruleset Applied: New emotional laws activated.");
+            emotionThreshold += 0.05f; // Example: Increase difficulty
+            hostilityThreshold += 0.1f; // Example: Adjust hostility tolerance
+        }
+    }
 }
