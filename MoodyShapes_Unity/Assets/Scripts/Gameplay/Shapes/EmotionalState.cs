@@ -131,8 +131,7 @@ public class EmotionalState : MonoBehaviour
             }
         }
     }
-    
-    private IEnumerator TemporaryDecayModifier(float durationModifier)
+      private IEnumerator TemporaryDecayModifier(float durationModifier)
     {
         // Save original stability
         float originalStability = Personality.EmotionalStability;
@@ -149,5 +148,42 @@ public class EmotionalState : MonoBehaviour
         // Restore original stability
         modifiedTraits.EmotionalStability = originalStability;
         Personality = modifiedTraits;
+    }
+    
+    /// <summary>
+    /// Suspends emotion decay temporarily
+    /// </summary>
+    private bool decaySuspended = false;
+    
+    /// <summary>
+    /// Suspends the natural decay of emotions temporarily.
+    /// Useful for sustained emotional reactions.
+    /// </summary>
+    public void SuspendDecay()
+    {
+        decaySuspended = true;
+    }
+    
+    /// <summary>
+    /// Resumes the natural decay of emotions after being suspended.
+    /// </summary>
+    public void ResumeDecay()
+    {
+        decaySuspended = false;
+    }
+    
+    /// <summary>
+    /// Overrides the standard UpdateDecay method to respect suspension
+    /// </summary>
+    public void UpdateDecay(float deltaTime)
+    {
+        if (decaySuspended) return;
+        
+        decayTimer += deltaTime;
+        if (decayTimer >= decayCheckInterval)
+        {
+            decayTimer = 0;
+            ApplyDecay(decayCheckInterval);
+        }
     }
 }
