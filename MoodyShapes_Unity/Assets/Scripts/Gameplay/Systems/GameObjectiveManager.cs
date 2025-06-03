@@ -41,6 +41,16 @@ public class GameObjectiveManager : MonoBehaviour
     [Tooltip("Enable evolving rulesets every few levels.")]
     [SerializeField] private bool enableEvolvingRulesets = true;
 
+    [Header("Dynamic Difficulty Settings")]
+    [Tooltip("Enable dynamic difficulty adjustment based on player performance.")]
+    [SerializeField] private bool enableDynamicDifficulty = true;
+
+    [Tooltip("Base difficulty multiplier.")]
+    [SerializeField] private float baseDifficultyMultiplier = 1.0f;
+
+    [Tooltip("Maximum difficulty multiplier.")]
+    [SerializeField] private float maxDifficultyMultiplier = 2.0f;
+
     private List<EmotionSystem> _shapes;
     private float _elapsedTime;
     private bool _ended;
@@ -48,6 +58,7 @@ public class GameObjectiveManager : MonoBehaviour
     private List<string> _shapeLetters;
     private int _currentLevel;
     private bool _hiddenEndingTriggered;
+    private float _currentDifficultyMultiplier;
 
     private void Awake()
     {
@@ -94,6 +105,8 @@ public class GameObjectiveManager : MonoBehaviour
         CheckHiddenEnding();
         ApplyEvolvingRuleset();
         ApplyEnvironmentalChanges();
+        AdjustDifficulty();
+        ProvidePlayerFeedback();
     }
 
     /// <summary>
@@ -282,5 +295,43 @@ public class GameObjectiveManager : MonoBehaviour
             emotionThreshold += 0.05f; // Example: Increase difficulty
             hostilityThreshold += 0.1f; // Example: Adjust hostility tolerance
         }
+    }
+
+    private void AdjustDifficulty()
+    {
+        if (!enableDynamicDifficulty) return;
+
+        float performanceScore = (SpreadRatio + MinRelationshipScore) / 2.0f;
+        _currentDifficultyMultiplier = Mathf.Lerp(baseDifficultyMultiplier, maxDifficultyMultiplier, performanceScore);
+
+        emotionThreshold *= _currentDifficultyMultiplier;
+        hostilityThreshold *= _currentDifficultyMultiplier;
+
+        Debug.Log($"Difficulty adjusted: Multiplier = {_currentDifficultyMultiplier:F2}");
+    }
+
+    private void ProvidePlayerFeedback()
+    {
+        string feedbackMessage = "";
+
+        if (SpreadRatio >= 0.9f)
+        {
+            feedbackMessage += "Great job spreading the target emotion!\n";
+        }
+        else
+        {
+            feedbackMessage += "Keep working on spreading the target emotion.\n";
+        }
+
+        if (MinRelationshipScore >= 0.8f)
+        {
+            feedbackMessage += "Relationships are harmonious!\n";
+        }
+        else
+        {
+            feedbackMessage += "Watch out for hostile relationships.\n";
+        }
+
+        Debug.Log(feedbackMessage);
     }
 }
