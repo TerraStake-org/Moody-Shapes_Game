@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [System.Serializable]
-public class EmotionalState
+public class EmotionalState : MonoBehaviour
 {
     public EmotionType CurrentEmotion { get; private set; }
     public float Intensity { get; private set; }
@@ -95,10 +96,58 @@ public class EmotionalState
     public bool HasEmotion(EmotionType emotion)
     {
         return (CurrentEmotion & emotion) != 0;
-    }
-
-    public bool IsDominantEmotion()
+    }    public bool IsDominantEmotion()
     {
         return CurrentEmotion == Personality.DominantTrait;
+    }
+    
+    public void ProcessStimulus(EmotionalStimulus stimulus)
+    {
+        if (!stimulus.ShouldAffect(gameObject)) return;
+
+        float potency = stimulus.GetEffectivePotency(Personality);
+       
+        // Apply primary effect
+        if ((stimulus.PrimaryEffect.EmotionToTrigger & Personality.ResistantTrait) == 0)
+        {
+            float intensity = potency * stimulus.PrimaryEffect.IntensityMultiplier;
+            SetEmotion(stimulus.PrimaryEffect.EmotionToTrigger, intensity);
+           
+            // Modify decay rate temporarily
+            if (stimulus.PrimaryEffect.DurationModifier > 0)
+            {
+                StartCoroutine(TemporaryDecayModifier(stimulus.PrimaryEffect.DurationModifier));
+            }
+        }
+
+        // Process secondary effects
+        foreach (var effect in stimulus.SecondaryEffects)
+        {
+            // Similar processing with potentially reduced impact
+            if ((effect.EmotionToTrigger & Personality.ResistantTrait) == 0)
+            {
+                float intensity = potency * effect.IntensityMultiplier * 0.7f; // Secondary effects are weaker
+                SetEmotion(effect.EmotionToTrigger, intensity);
+            }
+        }
+    }
+    
+    private IEnumerator TemporaryDecayModifier(float durationModifier)
+    {
+        // Save original stability
+        float originalStability = Personality.EmotionalStability;
+        
+        // Create a modified personality with longer decay time (higher stability)
+        EmotionTraits modifiedTraits = Personality;
+        modifiedTraits.EmotionalStability = Mathf.Clamp01(originalStability * durationModifier);
+        Personality = modifiedTraits;
+        
+        // Wait for the modified duration
+        float modifiedDuration = 5f * durationModifier; // Base duration of 5 seconds, modified by the stimulus
+        yield return new WaitForSeconds(modifiedDuration);
+        
+        // Restore original stability
+        modifiedTraits.EmotionalStability = originalStability;
+        Personality = modifiedTraits;
     }
 }
