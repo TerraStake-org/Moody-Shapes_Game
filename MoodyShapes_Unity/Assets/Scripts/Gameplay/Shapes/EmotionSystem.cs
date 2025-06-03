@@ -9,13 +9,16 @@ public class EmotionSystem : MonoBehaviour
     [Header("Core Configuration")]
     [SerializeField] private EmotionProfileSO _emotionProfile;
     [SerializeField] private bool _enableDecay = true;
-    [SerializeField] private float _decayTickInterval = 0.2f;
-
-    [Header("State Monitoring")]
+    [SerializeField] private float _decayTickInterval = 0.2f;    [Header("State Monitoring")]
     [SerializeField, ReadOnly]
     private EmotionalState _currentEmotionalState;
     [SerializeField, ReadOnly]
-    private List<ActiveEmotionModifier> _activeModifiers = new List<ActiveEmotionModifier>();    // Events
+    private List<ActiveEmotionModifier> _activeModifiers = new List<ActiveEmotionModifier>();
+    
+    // Public accessors
+    public EmotionalState CurrentState => _currentEmotionalState;
+    
+    // Events
     public event System.Action<EmotionChangeEvent> OnEmotionChanged;
     public static event System.Action<EmotionChangeEvent> OnAnyEmotionChanged;
     public event System.Action<EmotionalStimulus, ref bool> OnStimulusReceived;
